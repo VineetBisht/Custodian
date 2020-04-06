@@ -56,22 +56,22 @@ public class HomePagerAdapter extends PagerAdapter {
         });
 
         card.setText(options.get(position));
-        switch (options.get(position)) {
-            case "Quick Fixes":
-                image.setImageResource(R.mipmap.fix);
-                break;
-            case "Cost Reduction":
-                image.setImageResource(R.mipmap.money);
-                break;
-            case "New Booking":
-                image.setImageResource(R.mipmap.calendar);
-                break;
-
-            default:
-                Log.e(HomePagerAdapter.class.getName(), "Image Resource Error");
-                break;
-        }
-        container.addView(itemView, 0);
+//        switch (options.get(position)) {
+//            case "Quick Fixes":
+//                image.setImageResource(R.mipmap.fix);
+//                break;
+//            case "Cost Reduction":
+//                image.setImageResource(R.mipmap.money);
+//                break;
+//            case "New Booking":
+//                image.setImageResource(R.mipmap.calendar);
+//                break;
+//
+//            default:
+//                Log.e(HomePagerAdapter.class.getName(), "Image Resource Error");
+//                break;
+//        }
+//        container.addView(itemView, 0);
         return itemView;
     }
 
