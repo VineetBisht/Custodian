@@ -8,13 +8,14 @@
     android:layout_height="match_parent">
 
     <AutoCompleteTextView
-        android:id="@+id/address"
+        android:id="@+id/email_reg"
         android:layout_width="match_parent"
         android:layout_height="63dp"
         android:ems="10"
         android:gravity="left"
         android:hint="Search Address"
         android:inputType="text"
+        android:textColor="@color/white"
         android:textColorHint="@color/white" />
 
     <com.google.android.gms.maps.MapView
@@ -22,7 +23,7 @@
         android:layout_width="409dp"
         android:layout_height="314dp"
         android:inputType="textNoSuggestions"
-        android:layout_below="@id/address"/>
+        android:layout_below="@id/email_reg"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

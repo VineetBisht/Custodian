@@ -1,7 +1,9 @@
 package com.example.custodian.ui.home;
 
+import android.Manifest;
 import android.animation.ArgbEvaluator;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -17,12 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
@@ -58,11 +57,11 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
         argbEvaluator = new ArgbEvaluator();
         viewPager = root.findViewById(R.id.viewPager);
-        address = root.findViewById(R.id.address);
+        address = root.findViewById(R.id.email_reg);
         mapView = root.findViewById(R.id.mapView);
         address.setOnKeyListener(this);
 
-        if(mapView!=null) {
+        if (mapView != null) {
             mapView.onCreate(null);
             mapView.onResume();
             mapView.getMapAsync(this);
@@ -114,11 +113,11 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
 
             @Override
             public void onPageSelected(int position) {
-                for(ImageView i:dots){
-                    i.setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.dot));
+                for (ImageView i : dots) {
+                    i.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.dot));
                 }
 
-                dots[position].setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.active_dot));
+                dots[position].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.active_dot));
             }
 
             @Override
@@ -141,7 +140,7 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
     @Override
     public void onPagerClick(int position) {
         NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
-        switch (position){
+        switch (position) {
 //            case 0:
 //                navController.navigate(R.id.quickFixFragment);
 //                break;
@@ -170,9 +169,18 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
         MapsInitializer.initialize(getContext());
         gmap = googleMap;
         gmap.setMinZoomPreference(15);
-        LatLng ny = new LatLng(40.7143528, -74.0059731);
-        gmap.moveCamera(CameraUpdateFactory.newLatLng(ny));
-
+        if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        }else{
+            ActivityCompat.requestPermissions(getActivity(), new String[] {
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION },
+                    1);
+        }
     }
 
     @Override
@@ -195,7 +203,7 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
             latitude = addr.getLatitude();
             longitude = addr.getLongitude();
         } catch (IOException e) {
-            Log.i(HomeFragment.class.getName(),e.toString());
+            Log.i(HomeFragment.class.getName(), e.toString());
         }
         return new Double[]{latitude, longitude};
     }
