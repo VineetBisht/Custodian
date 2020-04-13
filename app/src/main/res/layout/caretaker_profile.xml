@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black">
+
+        <ImageView
+            android:id="@+id/header_cover_image"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/headerkids" />
+
+        <ImageView
+            android:id="@+id/care_profile_photo"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_below="@+id/header_cover_image"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-60dp"
+            android:background="@drawable/profile_circular_border_imageview"
+            android:elevation="5dp"
+            android:padding="20dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile" />
+
+        <RelativeLayout
+            android:id="@+id/profile_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/header_cover_image"
+            android:background="@color/little_black"
+            android:elevation="4dp"
+            android:paddingBottom="24dp">
+
+            <TextView
+                android:id="@+id/care_profile_fullname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="76dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Full Name"
+                android:textColor="#fff"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/care_profile_bio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/care_profile_fullname"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="12dp"
+                android:text="Short Description"
+                android:textColor="#fff"
+                android:textSize="14sp"
+                android:textStyle="italic" />
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/profile_layout"
+            android:layout_marginTop="5dp"
+            android:background="@color/black"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/profile_txtFirstName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:hint="First Name"
+                android:padding="20dp" />
+
+            <TextView
+                android:id="@+id/profile_txtLastName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:hint="Last Name"
+                android:padding="20dp" />
+
+            <TextView
+                android:id="@+id/profile_txtMail"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:hint="Mail"
+                android:inputType="textEmailAddress"
+                android:padding="20dp" />
+
+            <TextView
+                android:id="@+id/profile_txtBirthday"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:hint="Birthday (YYYY-MM-DD)"
+                android:inputType="date"
+                android:padding="20dp" />
+
+            <TextView
+                android:id="@+id/profile_txtAddress"
+                android:layout_width="match_parent"
+                android:layout_height="61dp"
+                android:background="#fff"
+                android:gravity="top|left"
+                android:hint="Address"
+                android:inputType="textMultiLine"
+                android:lines="4"
+                android:maxLines="6"
+                android:minLines="4"
+                android:padding="20dp"
+                android:layout_marginBottom="10dp"
+                android:scrollbars="vertical" />
+
+            <Button
+                android:id="@+id/care_profile_hire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/little_black"
+                android:text="hire"
+                android:layout_margin="10dp"
+                android:textColor="#fff"
+                android:textSize="15dp"
+                android:textStyle="bold" />
+            <Button
+                android:id="@+id/care_profile_back"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/little_black"
+                android:text="Back"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:textColor="#fff"/>
+        </LinearLayout>
+    </RelativeLayout>
+</ScrollView>
+
