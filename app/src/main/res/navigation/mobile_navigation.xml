@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.custodian.ui.Login.LoginFragment"
+        android:name="com.example.custodian.ui.RecentBookings.RecentBookings"
         android:label="@string/title_login"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_recent_bookings" />
 </navigation>

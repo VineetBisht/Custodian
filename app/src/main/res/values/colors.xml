@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="mainRecyclerView">#C1DAE0DE</color>
+    <color name="black">#1E1D1D</color>
+    <color name="little_black">#454343</color>
+    <color name="white">#ffff</color>
+    <color name="items">#F2FFE0</color>
 </resources>

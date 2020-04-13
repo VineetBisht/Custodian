@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -53,7 +54,8 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        final View root = inflater.inflate(R.layout.fragment_home, container, false);
         argbEvaluator = new ArgbEvaluator();
         viewPager = root.findViewById(R.id.viewPager);
         address = root.findViewById(R.id.address);
@@ -104,6 +106,26 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
             sliderDots.addView(dots[i], params);
         }
         dots[0].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.active_dot));
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                for(ImageView i:dots){
+                    i.setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.dot));
+                }
+
+                dots[position].setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.active_dot));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         return root;
     }

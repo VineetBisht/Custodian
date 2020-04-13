@@ -50,12 +50,12 @@ public class HomePagerAdapter extends PagerAdapter {
         itemView.findViewById(R.id.cardview).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("here","working");
                 onPagerListener.onPagerClick(positionInside);
             }
         });
 
         card.setText(options.get(position));
+        image.setImageResource(R.drawable.ic_tag_faces_black_24dp);
 //        switch (options.get(position)) {
 //            case "Quick Fixes":
 //                image.setImageResource(R.mipmap.fix);
@@ -71,7 +71,7 @@ public class HomePagerAdapter extends PagerAdapter {
 //                Log.e(HomePagerAdapter.class.getName(), "Image Resource Error");
 //                break;
 //        }
-//        container.addView(itemView, 0);
+        container.addView(itemView, 0);
         return itemView;
     }
 
