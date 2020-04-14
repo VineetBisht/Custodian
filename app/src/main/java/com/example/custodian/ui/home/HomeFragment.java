@@ -51,8 +51,8 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
     ArgbEvaluator argbEvaluator;
 
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final @NonNull LayoutInflater inflater,
+                             final ViewGroup container, Bundle savedInstanceState) {
 
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
         argbEvaluator = new ArgbEvaluator();
@@ -116,13 +116,11 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
                 for (ImageView i : dots) {
                     i.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.dot));
                 }
-
                 dots[position].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.active_dot));
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
             }
         });
 
@@ -175,10 +173,10 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
                         PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
             googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        }else{
-            ActivityCompat.requestPermissions(getActivity(), new String[] {
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{
                             Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION },
+                            Manifest.permission.ACCESS_COARSE_LOCATION},
                     1);
         }
     }

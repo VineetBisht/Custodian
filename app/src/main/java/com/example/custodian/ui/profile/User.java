@@ -1,5 +1,7 @@
 package com.example.custodian.ui.profile;
 
+import android.net.Uri;
+
 import java.util.Date;
 
 public class User {
@@ -8,7 +10,6 @@ public class User {
     private String mail;
     private String address;
     private String birthday;
-
 
 
     public User(String firstName, String lastName, String mail, String address, String birthday) {

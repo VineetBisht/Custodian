@@ -21,7 +21,7 @@
         app:layout_constraintVertical_bias="0.057"></ImageButton>
 
     <EditText
-        android:id="@+id/username_log"
+        android:id="@+id/first_reg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -33,7 +33,7 @@
         app:layout_constraintTop_toBottomOf="@+id/login_image"></EditText>
 
     <EditText
-        android:id="@+id/password_log"
+        android:id="@+id/last_reg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Last Name"
@@ -42,7 +42,7 @@
         android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username_log"></EditText>
+        app:layout_constraintTop_toBottomOf="@+id/first_reg"></EditText>
 
     <EditText
         android:id="@+id/username_reg"
@@ -54,7 +54,7 @@
         android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_log" />
+        app:layout_constraintTop_toBottomOf="@+id/last_reg" />
 
     <EditText
         android:id="@+id/pass_reg"
@@ -107,10 +107,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.473"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_txtBirthday"></AutoCompleteTextView>
+        app:layout_constraintTop_toBottomOf="@+id/dob_reg"></AutoCompleteTextView>
 
     <EditText
-        android:id="@+id/profile_txtBirthday"
+        android:id="@+id/dob_reg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Birthday (YYYY-MM-DD)"
@@ -123,7 +123,7 @@
         app:layout_constraintTop_toBottomOf="@+id/email_reg" />
 
     <Button
-        android:id="@+id/login_button"
+        android:id="@+id/reg_reg"
         android:layout_width="111dp"
         android:layout_height="47dp"
         android:layout_marginTop="56dp"
@@ -138,7 +138,7 @@
         app:layout_constraintVertical_bias="0.0"></Button>
 
     <Button
-        android:id="@+id/register_button"
+        android:id="@+id/cancel_reg"
         android:layout_width="119dp"
         android:layout_height="47dp"
         android:layout_marginStart="24dp"
@@ -150,7 +150,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/login_button"
+        app:layout_constraintStart_toEndOf="@+id/reg_reg"
         app:layout_constraintTop_toBottomOf="@+id/address_reg"
         app:layout_constraintVertical_bias="0.0"></Button>
 

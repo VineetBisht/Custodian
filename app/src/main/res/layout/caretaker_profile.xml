@@ -16,8 +16,8 @@
             android:scaleType="centerCrop"
             android:src="@mipmap/headerkids" />
 
-        <ImageView
-            android:id="@+id/care_profile_photo"
+        <ImageButton
+            android:id="@+id/care_photo"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_below="@+id/header_cover_image"
@@ -74,7 +74,7 @@
 
 
             <TextView
-                android:id="@+id/profile_txtFirstName"
+                android:id="@+id/care_fName"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
@@ -82,7 +82,7 @@
                 android:padding="20dp" />
 
             <TextView
-                android:id="@+id/profile_txtLastName"
+                android:id="@+id/care_lName"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
@@ -90,7 +90,7 @@
                 android:padding="20dp" />
 
             <TextView
-                android:id="@+id/profile_txtMail"
+                android:id="@+id/care_mail"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
@@ -99,7 +99,7 @@
                 android:padding="20dp" />
 
             <TextView
-                android:id="@+id/profile_txtBirthday"
+                android:id="@+id/care_dob"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
@@ -108,9 +108,10 @@
                 android:padding="20dp" />
 
             <TextView
-                android:id="@+id/profile_txtAddress"
+                android:id="@+id/care_address"
                 android:layout_width="match_parent"
-                android:layout_height="61dp"
+                android:layout_height="82dp"
+                android:layout_marginBottom="10dp"
                 android:background="#fff"
                 android:gravity="top|left"
                 android:hint="Address"
@@ -119,7 +120,6 @@
                 android:maxLines="6"
                 android:minLines="4"
                 android:padding="20dp"
-                android:layout_marginBottom="10dp"
                 android:scrollbars="vertical" />
 
             <Button
