@@ -45,7 +45,6 @@ public class RecentBookings extends Fragment implements ValueEventListener {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         activity=getActivity();
         recyclerView = view.findViewById(R.id.bookings_list);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();

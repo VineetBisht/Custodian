@@ -122,7 +122,7 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
             final View root_login = inflater.inflate(R.layout.login, null);
 
             alert.setView(root_login);
-            alert.setCancelable(false);
+            alert.setCancelable(true);
             dialog = alert.create();
 
             final EditText username = root_login.findViewById(R.id.username_login);
@@ -150,7 +150,7 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
                     LayoutInflater inflater = getLayoutInflater();
                     View root_reg = inflater.inflate(R.layout.register, null);
                     alert_reg.setView(root_reg);
-                    alert_reg.setCancelable(false);
+                    alert_reg.setCancelable(true);
                     dialog_Reg = alert_reg.create();
 
                     final Button reg_reg, cancel;
@@ -363,7 +363,6 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
-                    Toast.makeText(getActivity().getApplicationContext(), "No Such file or Path found!!", Toast.LENGTH_LONG).show();
                 }
             });
         }

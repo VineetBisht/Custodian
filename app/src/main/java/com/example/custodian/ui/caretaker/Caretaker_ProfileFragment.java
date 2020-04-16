@@ -112,13 +112,13 @@ public class Caretaker_ProfileFragment extends Fragment implements DatePickerDia
                     hired.addCaretaker(caretaker);
                     hired.addDate_of_hire(hire_date);
                     databaseReference.setValue(hired);
-                    Toast.makeText(getContext(), "Successfull", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Successfull", Toast.LENGTH_LONG).show();
                     return;
                 }else{
                     hired.addCaretaker(caretaker);
                     hired.addDate_of_hire(hire_date);
                     databaseReference.setValue(hired);
-                    Toast.makeText(getContext(), "Successfull", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Successfull", Toast.LENGTH_LONG).show();
                     return;
                 }
 
