@@ -2,10 +2,13 @@ package com.example.custodian.ui.home;
 
 import android.Manifest;
 import android.animation.ArgbEvaluator;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -27,6 +30,11 @@ import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.custodian.R;
+import com.example.custodian.model.home.HomePagerAdapter;
+import com.example.custodian.model.home.PlaceAutoSuggestAdapter;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -34,31 +42,34 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerListener, View.OnKeyListener, OnMapReadyCallback {
 
     private GoogleMap gmap;
-    ViewPager viewPager;
-    LinearLayout sliderDots;
-    AutoCompleteTextView address;
-    MapView mapView;
+    private ViewPager viewPager;
+    private LinearLayout sliderDots;
+    private AutoCompleteTextView address;
+    private MapView mapView;
     private int dots_count;
     private ImageView[] dots;
-    ArgbEvaluator argbEvaluator;
-
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
     public View onCreateView(final @NonNull LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
 
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
-        argbEvaluator = new ArgbEvaluator();
-        viewPager = root.findViewById(R.id.viewPager);
-        address = root.findViewById(R.id.email_reg);
-        mapView = root.findViewById(R.id.mapView);
+        return root;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        viewPager = view.findViewById(R.id.viewPager);
+        address = view.findViewById(R.id.email_reg);
+        mapView = view.findViewById(R.id.mapView);
         address.setOnKeyListener(this);
 
         if (mapView != null) {
@@ -88,14 +99,15 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
             }
         });
 
-        HomePagerAdapter adapter = new HomePagerAdapter(getOptions(), getContext(), this);
+        HomePagerAdapter adapter = new HomePagerAdapter(getContext(), this);
         viewPager.setAdapter(adapter);
         viewPager.setClipToPadding(false);
         viewPager.setOffscreenPageLimit(2);
         viewPager.setPadding(20, 0, 20, 0);
 
-        sliderDots = root.findViewById(R.id.sliderDots);
+        sliderDots = view.findViewById(R.id.sliderDots);
         dots_count = adapter.getCount();
+        final ArgbEvaluator argbEvaluator = new ArgbEvaluator();
         dots = new ImageView[dots_count];
         for (int i = 0; i < dots_count; i++) {
             dots[i] = new ImageView(getContext());
@@ -106,9 +118,28 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
         }
         dots[0].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.active_dot));
 
+        final Integer[] colors = {
+                getResources().getColor(R.color.color1),
+                getResources().getColor(R.color.color2),
+                getResources().getColor(R.color.color3),
+        };
+
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (position < (dots_count - 1) && position < (colors.length - 1)) {
+                    viewPager.setBackgroundColor(
+                            (Integer) argbEvaluator.evaluate(
+                                    positionOffset,
+                                    colors[position],
+                                    colors[position + 1]
+                            )
+                    );
+                }
+
+                else {
+                    viewPager.setBackgroundColor(colors[colors.length - 1]);
+                }
             }
 
             @Override
@@ -123,32 +154,14 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
             public void onPageScrollStateChanged(int state) {
             }
         });
-
-        return root;
-    }
-
-    public static ArrayList<String> getOptions() {
-        ArrayList<String> options = new ArrayList<>();
-        options.add("Adrian");
-        options.add("Emma");
-        options.add("Rose");
-        return options;
     }
 
     @Override
     public void onPagerClick(int position) {
         NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
-        switch (position) {
-//            case 0:
-//                navController.navigate(R.id.quickFixFragment);
-//                break;
-//            case 1:
-//                navController.navigate(R.id.costReductionFragment);
-//                break;
-//            case 2:
-//                navController.navigate(R.id.bookingMain);
-//                break;
-        }
+        Bundle bundle = new Bundle();
+        bundle.putInt("pos", position);
+        navController.navigate(R.id.caretaker_ProfileFragment, bundle);
     }
 
     @Override
@@ -163,7 +176,9 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
+        Log.i("map","ready");
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());;
         MapsInitializer.initialize(getContext());
         gmap = googleMap;
         gmap.setMinZoomPreference(15);
@@ -172,12 +187,27 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
                 ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
+
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
+                                gmap.animateCamera(cameraUpdate);
+                                MarkerOptions mp = new MarkerOptions();
+                                mp.position(latLng);
+                                mp.title("My Position");
+                                gmap.addMarker(mp);
+                            }
+                        }
+                    });
+
             googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         } else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION},
-                    1);
+            checkLocationPermission();
         }
     }
 
@@ -204,5 +234,39 @@ public class HomeFragment extends Fragment implements HomePagerAdapter.OnPagerLi
             Log.i(HomeFragment.class.getName(), e.toString());
         }
         return new Double[]{latitude, longitude};
+    }
+
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Location Permission Needed")
+                        .setMessage("This app needs the Location permission, please accept to use location functionality")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Prompt the user once explanation has been shown
+                                ActivityCompat.requestPermissions(getActivity(),
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
+                            }
+                        })
+                        .create()
+                        .show();
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+        }
     }
 }

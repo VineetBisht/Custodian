@@ -1,11 +1,9 @@
-package com.example.custodian.ui.home;
+package com.example.custodian.model.home;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,23 +11,27 @@ import androidx.cardview.widget.CardView;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.example.custodian.R;
+import com.example.custodian.model.caretaker.Caretaker;
+import com.example.custodian.model.caretaker.CaretakerManager;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class HomePagerAdapter extends PagerAdapter {
-    private List<String> options;
+
+    private List<Caretaker> caretakers;
     Context context;
     OnPagerListener onPagerListener;
 
-    HomePagerAdapter(List<String> options,  Context context, OnPagerListener onPagerListener) {
-        this.options = options;
+    public HomePagerAdapter(Context context, OnPagerListener onPagerListener) {
         this.context = context;
-        this.onPagerListener=onPagerListener;
+        this.onPagerListener = onPagerListener;
+        caretakers = CaretakerManager.getCaretakers();
     }
 
     @Override
     public int getCount() {
-        return options.size();
+        return caretakers.size();
     }
 
     @Override
@@ -40,12 +42,12 @@ public class HomePagerAdapter extends PagerAdapter {
     @NonNull
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         View itemView = LayoutInflater.from(context)
-                .inflate(R.layout.main_options, container
+                .inflate(R.layout.caretaker_item, container
                         , false);
 
         TextView card = itemView.findViewById(R.id.name);
-        final int positionInside=position;
-        ImageView image = itemView.findViewById(R.id.option_image);
+        final int positionInside = position;
+        de.hdodenhof.circleimageview.CircleImageView image = itemView.findViewById(R.id.option_image);
 
         itemView.findViewById(R.id.cardview).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,33 +56,20 @@ public class HomePagerAdapter extends PagerAdapter {
             }
         });
 
-        card.setText(options.get(position));
-        image.setImageResource(R.drawable.ic_tag_faces_black_24dp);
-//        switch (options.get(position)) {
-//            case "Quick Fixes":
-//                image.setImageResource(R.mipmap.fix);
-//                break;
-//            case "Cost Reduction":
-//                image.setImageResource(R.mipmap.money);
-//                break;
-//            case "New Booking":
-//                image.setImageResource(R.mipmap.calendar);
-//                break;
-//
-//            default:
-//                Log.e(HomePagerAdapter.class.getName(), "Image Resource Error");
-//                break;
-//        }
+        card.setText(caretakers.get(position).getFullname());
+
+        Picasso.get().load(caretakers.get(position).getImage()).into(image);
+
         container.addView(itemView, 0);
         return itemView;
     }
 
-    public interface OnPagerListener{
+    public interface OnPagerListener {
         void onPagerClick(int position);
     }
 
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-        container.removeView((CardView)object);
+        container.removeView((CardView) object);
     }
 }
 

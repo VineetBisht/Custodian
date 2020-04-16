@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/black"
     android:gravity="center_horizontal|center_vertical"
     android:orientation="vertical">
 
@@ -11,28 +10,39 @@
         android:id="@+id/cardview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/black"
-        android:clickable="true"
         android:layout_margin="3dp"
+        android:clickable="true"
         app:cardCornerRadius="20dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/black">
-
-            <ImageView
-                android:id="@+id/option_image"
+            android:layout_gravity="center_horizontal">
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="151dp"
-                android:background="@color/mainRecyclerView"
-                app:srcCompat="@drawable/ic_tag_faces_black_24dp" />
+                android:layout_height="wrap_content"
+                android:id="@+id/linearl"
+                android:background="@color/little_black"
+                android:gravity="center_horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/option_image"
+                    android:layout_width="150dp"
+                    android:layout_height="151dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    app:border_color="@color/dp_border"
+                    app:border_width="2dp"
+                    app:srcCompat="@drawable/ic_tag_faces_black_24dp" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_below="@+id/option_image"
+                android:layout_below="@id/linearl"
                 android:background="@color/little_black"
                 android:gravity="center"
                 android:text="TextView"

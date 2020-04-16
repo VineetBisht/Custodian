@@ -1,4 +1,4 @@
-package com.example.custodian.ui.home;
+package com.example.custodian.model.home;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;

@@ -19,7 +19,13 @@
 
     <fragment
         android:id="@+id/navigation_recent"
-        android:name="com.example.custodian.ui.RecentBookings.RecentBookings"
+        android:name="com.example.custodian.ui.recents.RecentBookings"
         android:label="@string/title_login"
         tools:layout="@layout/fragment_recent_bookings" />
+
+    <fragment
+        android:id="@+id/caretaker_ProfileFragment"
+        android:name="com.example.custodian.ui.caretaker.Caretaker_ProfileFragment"
+        android:label="Caretaker"
+        tools:layout="@layout/caretaker_profile"/>
 </navigation>

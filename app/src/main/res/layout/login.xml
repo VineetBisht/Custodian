@@ -20,43 +20,52 @@
         app:layout_constraintVertical_bias="0.282"></ImageView>
 
     <EditText
-        android:id="@+id/first_reg"
+        android:id="@+id/username_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:hint="Username"
+        android:hint="Email"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:maxLines="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_image"></EditText>
+        app:layout_constraintTop_toBottomOf="@+id/login_image"
+        app:layout_constraintVertical_bias="0.056"></EditText>
 
     <EditText
-        android:id="@+id/last_reg"
+        android:id="@+id/password_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:layout_marginBottom="300dp"
         android:hint="Password"
         android:inputType="textPassword"
         android:textColor="@color/white"
+        android:maxLines="1"
         android:textColorHint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.842"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/first_reg"></EditText>
+        app:layout_constraintTop_toBottomOf="@+id/username_login"
+        app:layout_constraintVertical_bias="0.022"></EditText>
 
     <Button
         android:id="@+id/reg_reg"
         android:layout_width="111dp"
         android:layout_height="47dp"
+        android:layout_marginBottom="30dp"
         android:background="@color/black"
         android:text="Login"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.263"
+        app:layout_constraintHorizontal_bias="0.136"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/last_reg"
-        app:layout_constraintVertical_bias="0.119"></Button>
+        app:layout_constraintTop_toBottomOf="@+id/password_login"
+        app:layout_constraintVertical_bias="0.163"></Button>
 
     <Button
         android:id="@+id/cancel_reg"
@@ -64,16 +73,14 @@
         android:layout_height="47dp"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="56dp"
-        android:layout_marginBottom="244dp"
         android:background="@color/black"
         android:text="Register"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.302"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/reg_reg"
-        app:layout_constraintTop_toBottomOf="@+id/address_reg"
-        app:layout_constraintVertical_bias="0.0"></Button>
+        app:layout_constraintTop_toBottomOf="@+id/password_login"
+        app:layout_constraintVertical_bias="0.144"></Button>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

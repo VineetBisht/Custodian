@@ -1,8 +1,4 @@
-package com.example.custodian.ui.profile;
-
-import android.net.Uri;
-
-import java.util.Date;
+package com.example.custodian.model.profile;
 
 public class User {
     private String firstName;
@@ -10,14 +6,26 @@ public class User {
     private String mail;
     private String address;
     private String birthday;
+    private String username;
 
+    public User() {
+    }
 
-    public User(String firstName, String lastName, String mail, String address, String birthday) {
+    public User(String firstName, String lastName, String mail, String address, String birthday, String username) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.mail = mail;
         this.address = address;
         this.birthday = birthday;
+        this.username=username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFirstName() {

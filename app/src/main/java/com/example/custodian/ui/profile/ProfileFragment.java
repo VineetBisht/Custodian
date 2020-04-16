@@ -1,27 +1,32 @@
 package com.example.custodian.ui.profile;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,7 +35,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.custodian.R;
-import com.example.custodian.ui.home.PlaceAutoSuggestAdapter;
+import com.example.custodian.model.home.PlaceAutoSuggestAdapter;
+import com.example.custodian.model.profile.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,19 +54,25 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+
 public class ProfileFragment extends Fragment implements View.OnKeyListener, DatePickerDialog.OnDateSetListener {
 
     private EditText profile_txtFirstName, profile_txtLastName, profile_txtMail, profile_txtBirthday, birthday_reg;
+    private TextView profile_fullname;
+    private ProgressBar progress;
     private AutoCompleteTextView profile_txtAddress;
     private FirebaseAuth mAuth;
     private FirebaseUser fUser;
-    private ImageButton image,prof_image;
-    private final int TAKE_PICTURE = 1,PROFILE_PICTURE=2;
+    private de.hdodenhof.circleimageview.CircleImageView image;
+    private final int TAKE_PICTURE = 1, PROFILE_PICTURE = 2;
     private StorageReference storageReference;
     private DatabaseReference databaseReference;
-    private Uri dpPath,prof_dpPath;
+    private Uri dpPath;
     private User user;
+    private final boolean success[] = {false};
     private String dob_reg;
+    private AlertDialog dialog, dialog_Reg;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,88 +84,160 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        Button btnSave;
-        mAuth= FirebaseAuth.getInstance();
+        Button btnSave, btnLogout;
+        mAuth = FirebaseAuth.getInstance();
+//        mAuth.signOut();
         fUser = mAuth.getCurrentUser();
-
         storageReference = FirebaseStorage.getInstance().getReference();
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("data");
+        databaseReference = FirebaseDatabase.getInstance().getReference();
         profile_txtFirstName = view.findViewById(R.id.profile_txtFirstName);
         profile_txtLastName = view.findViewById(R.id.profile_txtLastName);
         profile_txtMail = view.findViewById(R.id.profile_txtMail);
         profile_txtAddress = view.findViewById(R.id.profile_txtAddress);
+        btnLogout = view.findViewById(R.id.logout);
+        profile_fullname = view.findViewById(R.id.profile_fullname);
         profile_txtBirthday = view.findViewById(R.id.profile_dob);
-        prof_image = view.findViewById(R.id.profile_photo);
+
         btnSave = view.findViewById(R.id.profile_btnSave);
         mAuth = FirebaseAuth.getInstance();
-
         profile_txtAddress.setAdapter(new PlaceAutoSuggestAdapter(getContext(), android.R.layout.simple_list_item_1));
         profile_txtAddress.setOnKeyListener(this);
         profile_txtMail.setOnKeyListener(this);
         profile_txtLastName.setOnKeyListener(this);
         profile_txtFirstName.setOnKeyListener(this);
+        profile_txtBirthday.setInputType(InputType.TYPE_NULL);
         profile_txtBirthday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(
-                        getContext(), ProfileFragment.this, 1900, 1, 1);
+                        getContext(), ProfileFragment.this, 2020, 1, 1);
                 datePickerDialog.show();
                 profile_txtBirthday.setText(dob_reg);
             }
         });
-        prof_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                takePictureIntent.setType("image/*");
-                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, PROFILE_PICTURE);
+
+        if (fUser == null) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            LayoutInflater inflater = getLayoutInflater();
+            final View root_login = inflater.inflate(R.layout.login, null);
+
+            alert.setView(root_login);
+            alert.setCancelable(false);
+            dialog = alert.create();
+
+            final EditText username = root_login.findViewById(R.id.username_login);
+            final EditText password = root_login.findViewById(R.id.password_login);
+            Button register = root_login.findViewById(R.id.cancel_reg);
+            final Button login = root_login.findViewById(R.id.reg_reg);
+
+            username.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                            (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                        InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
+                    return false;
                 }
-            }
-        });
-
-        if (fUser==null) {
-            final Dialog dialog = new Dialog(getContext());
-            dialog.setContentView(R.layout.login);
-
-            final EditText username = dialog.findViewById(R.id.first_reg);
-            final EditText password = dialog.findViewById(R.id.last_reg);
-
-            username.setOnKeyListener(this);
+            });
             password.setOnKeyListener(this);
-
-            Button register = dialog.findViewById(R.id.cancel_reg);
-            final Button login = dialog.findViewById(R.id.reg_reg);
-
             register.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final Dialog dialogReg = new Dialog(getContext());
-                    image = dialogReg.findViewById(R.id.login_image);
+                    Activity activity = getActivity();
+                    AlertDialog.Builder alert_reg = new AlertDialog.Builder(activity);
+                    LayoutInflater inflater = getLayoutInflater();
+                    View root_reg = inflater.inflate(R.layout.register, null);
+                    alert_reg.setView(root_reg);
+                    alert_reg.setCancelable(false);
+                    dialog_Reg = alert_reg.create();
+
                     final Button reg_reg, cancel;
                     final EditText firstN, lastN, username, password, password_con, email_reg;
-                    birthday_reg = dialogReg.findViewById(R.id.dob_reg);
-                    reg_reg = dialogReg.findViewById(R.id.reg_reg);
-                    cancel = dialogReg.findViewById(R.id.cancel_reg);
-                    firstN = dialogReg.findViewById(R.id.first_reg);
-                    lastN = dialogReg.findViewById(R.id.last_reg);
-                    username = dialogReg.findViewById(R.id.username_reg);
-                    password = dialogReg.findViewById(R.id.pass_reg);
-                    password_con = dialogReg.findViewById(R.id.pass_con_reg);
-                    email_reg = dialogReg.findViewById(R.id.email_reg);
-                    ProfileFragment pf=new ProfileFragment();
 
-                    final AutoCompleteTextView address_reg = dialogReg.findViewById(R.id.address_reg);
+                    image = root_reg.findViewById(R.id.login_image);
+                    birthday_reg = root_reg.findViewById(R.id.dob_reg);
+                    reg_reg = root_reg.findViewById(R.id.reg_reg);
+                    cancel = root_reg.findViewById(R.id.cancel_reg);
+                    firstN = root_reg.findViewById(R.id.first_reg);
+                    progress = root_reg.findViewById(R.id.reg_progress);
+                    lastN = root_reg.findViewById(R.id.last_reg);
+                    username = root_reg.findViewById(R.id.username_reg);
+                    password = root_reg.findViewById(R.id.pass_reg);
+                    password_con = root_reg.findViewById(R.id.pass_con_reg);
+                    email_reg = root_reg.findViewById(R.id.email_reg);
+
+                    progress.setVisibility(View.INVISIBLE);
+                    final AutoCompleteTextView address_reg = root_reg.findViewById(R.id.address_reg);
                     address_reg.setAdapter(new PlaceAutoSuggestAdapter(getContext(), android.R.layout.simple_list_item_1));
 
-                    firstN.setOnKeyListener(pf);
-                    lastN.setOnKeyListener(pf);
-                    email_reg.setOnKeyListener(pf);
-                    username.setOnKeyListener(pf);
-                    password.setOnKeyListener(pf);
-                    password_con.setOnKeyListener(pf);
+                    firstN.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                                InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                            }
+                            return false;
+                        }
+                    });
+                    lastN.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                                InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                            }
+                            return false;
+                        }
+                    });
+                    email_reg.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                                InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                            }
+                            return false;
+                        }
+                    });
+                    username.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                                InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                            }
+                            return false;
+                        }
+                    });
+                    password.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                                InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                            }
+                            return false;
+                        }
+                    });
+                    password_con.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                                InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                            }
+                            return false;
+                        }
+                    });
                     address_reg.setOnKeyListener(new View.OnKeyListener() {
                         @Override
                         public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -165,24 +249,23 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
                             return false;
                         }
                     });
+                    birthday_reg.setInputType(InputType.TYPE_NULL);
                     birthday_reg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                            in.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                             DatePickerDialog datePickerDialog = new DatePickerDialog(
-                                    getContext(), ProfileFragment.this, 1900, 1, 1);
+                                    getContext(), ProfileFragment.this, 2020, 1, 1);
                             datePickerDialog.show();
-                            birthday_reg.setText(dob_reg);
                         }
                     });
                     image.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            takePictureIntent.setType("image/*");
                             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                                 startActivityForResult(takePictureIntent, TAKE_PICTURE);
+                            } else {
+                                Log.i("here", "Take picture intent is null");
                             }
                         }
                     });
@@ -197,35 +280,29 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
                                 return;
                             }
 
-                            if (password.getText().toString() != password_con.getText().toString()) {
-                                Toast.makeText(getContext(), "Passwords Do Not Match", Toast.LENGTH_LONG).show();
+                            if (password.getText().toString() == password_con.getText().toString()) {
+                                Toast.makeText(getContext(), "Passwords Do Not Match" + password.getText().toString() + password_con.getText().toString(), Toast.LENGTH_LONG).show();
                                 return;
                             }
-                            register(email_reg.getText().toString(), password.getText().toString());
-                            if (dpPath != null) {
-                                uploadFile(dpPath);
-                            } else {
-                                Log.i(getTag(), "No file upload");
-                            }
-                            User user = new User(firstN.getText().toString(),
+                            user = new User(firstN.getText().toString(),
                                     lastN.getText().toString(),
                                     email_reg.getText().toString(),
                                     address_reg.getText().toString(),
-                                    birthday_reg.getText().toString());
-                            databaseReference.setValue(user);
-                            Log.i(getTag(), "Successfully uploaded data");
-                            dialogReg.dismiss();
+                                    dob_reg, username.getText().toString().trim());
+                            register_email(email_reg.getText().toString(), password.getText().toString());
                         }
                     });
                     cancel.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            dialogReg.dismiss();
+                            dialog_Reg.dismiss();
                         }
                     });
+
+                    dialog_Reg.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                    dialog_Reg.show();
                 }
             });
-
             login.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -241,23 +318,52 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
                 }
             });
 
+            dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+            dialog.show();
         } else {
-            Log.i(getTag(), "Authenticated: " + fUser.getEmail());
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            Log.i("authenticated", "Authenticated: " + fUser.getEmail());
+
+            image = view.findViewById(R.id.profile_photo);
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                        startActivityForResult(takePictureIntent, PROFILE_PICTURE);
+                    }
+                }
+            });
+
+            databaseReference.child("data_" + fUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                     user = dataSnapshot.getValue(User.class);
                     profile_txtAddress.setText(user.getAddress());
                     profile_txtBirthday.setText(user.getBirthday());
                     profile_txtFirstName.setText(user.getFirstName());
                     profile_txtLastName.setText(user.getLastName());
                     profile_txtMail.setText(user.getMail());
+                    profile_fullname.setText(user.getUsername());
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.i(getTag(), "Data Read Cancelled");
+                }
+            });
+
+            final long ONE_MEGABYTE = 1024 * 1024;
+            storageReference.child("dp" + fUser.getUid()).getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    image.setImageBitmap(bmp);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    Toast.makeText(getActivity().getApplicationContext(), "No Such file or Path found!!", Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -274,13 +380,35 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
                         profile_txtLastName.getText().toString(),
                         profile_txtMail.getText().toString(),
                         profile_txtAddress.getText().toString(),
-                        profile_txtBirthday.getText().toString());
-                if(prof_image!=null)
-                uploadFile(prof_dpPath);
-                databaseReference.setValue(user);
-                Toast.makeText(getContext(),"Successfully Updated",Toast.LENGTH_SHORT);
+                        profile_txtBirthday.getText().toString(),
+                        user.getUsername());
+                if (image != null)
+                    uploadFile(dpPath);
+                databaseReference.child("data_" + fUser.getUid()).setValue(user);
+                Toast.makeText(getContext(), "Successfully Updated", Toast.LENGTH_LONG);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+                        navController.navigate(R.id.navigation_profile); }
+                }, 3000);
             }
         });
+
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAuth.signOut();
+                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+                navController.navigate(R.id.navigation_profile);
+            }
+        });
+
+        profile_txtBirthday.setOnKeyListener(this);
+        profile_txtFirstName.setOnKeyListener(this);
+        profile_txtLastName.setOnKeyListener(this);
+        profile_txtMail.setOnKeyListener(this);
+        profile_txtAddress.setOnKeyListener(this);
     }
 
     @Override
@@ -304,23 +432,28 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
         }
     }
 
-    private void register(String email, String password) {
+    private void register_email(String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(getTag(), "createUserWithEmail:success");
+                            Log.i("register", "createUserWithEmail:success");
                             fUser = mAuth.getCurrentUser();
+                            success[0] = true;
+                            onAuthStateChanged();
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(getTag(), "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getContext(), "Authentication failed.",
+                            Log.i("register", "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(getContext(), task.getException().toString(),
                                     Toast.LENGTH_SHORT).show();
+                            success[0] = false;
+                            onAuthStateChanged();
                         }
                     }
                 });
+        progress.setVisibility(View.VISIBLE);
     }
 
     private void signIn(String email, String password) {
@@ -333,6 +466,7 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
                             Log.d(getTag(), "signInWithEmail:success");
                             fUser = mAuth.getCurrentUser();
 
+                            dialog.dismiss();
                             NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
                             navController.navigate(R.id.navigation_profile);
                         } else {
@@ -348,87 +482,94 @@ public class ProfileFragment extends Fragment implements View.OnKeyListener, Dat
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == TAKE_PICTURE && resultCode == Activity.RESULT_OK) {
-            dpPath = data.getData();
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
+            dpPath = getImageUri(getActivity().getApplicationContext(), imageBitmap);
+            Log.i("dppath:", dpPath.getPath());
             image.setImageBitmap(imageBitmap);
-        }else if (requestCode == PROFILE_PICTURE && resultCode == Activity.RESULT_OK) {
-            prof_dpPath = data.getData();
+        } else if (requestCode == PROFILE_PICTURE && resultCode == Activity.RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
+            dpPath = getImageUri(getActivity().getApplicationContext(), imageBitmap);
+            Log.i("prof_dppath:", dpPath.getPath());
             image.setImageBitmap(imageBitmap);
         }
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-      dob_reg = year + "-" + month + "-" + dayOfMonth;
+        month += 1;
+        dob_reg = year + "-" + month + "-" + dayOfMonth;
+        if (birthday_reg != null)
+            birthday_reg.setText(dob_reg);
+        else
+            profile_txtBirthday.setText(dob_reg);
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     private void uploadFile(Uri dpPath) {
-        // Code for showing progressDialog while uploading
-        final ProgressDialog progressDialog
-                = new ProgressDialog(getContext());
-        progressDialog.setTitle("Uploading...");
-        progressDialog.show();
+        StorageReference mountainsRef = storageReference.child("dp" + fUser.getUid());
+        image.setDrawingCacheEnabled(true);
+        image.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        Log.i("Image Upload", "Starting ");
 
-        // Defining the child of storageReference
-        StorageReference ref
-                = storageReference
-                .child(
-                        "images/dp");
+        UploadTask uploadTask = mountainsRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(getContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
+                Log.i("Image Upload", "Failed " + exception);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getContext(), "Image Uploaded successfully", Toast.LENGTH_SHORT).show();
+                Log.i("Image Upload", "Success");
+                if (dialog_Reg != null) dialog_Reg.dismiss();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getContext(), "Uploading Image..", Toast.LENGTH_SHORT).show();
+                Log.i("Image Upload", "In Progress");
+            }
+        });
+    }
 
-        // adding listeners on upload
-        // or failure of image
-        ref.putFile(dpPath)
-                .addOnSuccessListener(
-                        new OnSuccessListener<UploadTask.TaskSnapshot>() {
-
-                            @Override
-                            public void onSuccess(
-                                    UploadTask.TaskSnapshot taskSnapshot) {
-
-                                // Image uploaded successfully
-                                // Dismiss dialog
-                                progressDialog.dismiss();
-                                Toast
-                                        .makeText(getContext(),
-                                                "Image Uploaded!!",
-                                                Toast.LENGTH_SHORT)
-                                        .show();
-                            }
-                        })
-
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                        // Error, Image not uploaded
-                        progressDialog.dismiss();
-                        Toast
-                                .makeText(getContext(),
-                                        "Failed " + e.getMessage(),
-                                        Toast.LENGTH_SHORT)
-                                .show();
-                    }
-                })
-                .addOnProgressListener(
-                        new OnProgressListener<UploadTask.TaskSnapshot>() {
-
-                            // Progress Listener for loading
-                            // percentage on the dialog box
-                            @Override
-                            public void onProgress(
-                                    UploadTask.TaskSnapshot taskSnapshot) {
-                                double progress
-                                        = (100.0
-                                        * taskSnapshot.getBytesTransferred()
-                                        / taskSnapshot.getTotalByteCount());
-                                progressDialog.setMessage(
-                                        "Uploaded "
-                                                + (int) progress + "%");
-                            }
-                        });
+    public void onAuthStateChanged() {
+        progress.setVisibility(View.INVISIBLE);
+        if (success[0]) {
+            Log.i("Authemtication:", "Auth state changed");
+            if (dpPath != null) {
+                uploadFile(dpPath);
+            } else {
+                Log.i("Image:", "No file upload");
+            }
+            databaseReference.child("data_" + fUser.getUid()).setValue(user);
+            Log.i("Uploading data", "Successfully uploaded data");
+            success[0] = false;
+            dialog_Reg.dismiss();
+            dialog.dismiss();
+            Toast.makeText(getContext(), "Successfully Registered", Toast.LENGTH_SHORT).show();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+                    navController.navigate(R.id.navigation_profile);
+                    // yourMethod();
+                }
+            }, 2000);
+        }
     }
 }
 

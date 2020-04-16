@@ -1,4 +1,4 @@
-package com.example.custodian.ui.home;
+package com.example.custodian.model.home;
 
 import org.json.JSONArray;
 import org.json.JSONException;

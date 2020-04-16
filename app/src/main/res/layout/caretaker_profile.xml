@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/black">
 
     <RelativeLayout
@@ -16,7 +17,7 @@
             android:scaleType="centerCrop"
             android:src="@mipmap/headerkids" />
 
-        <ImageButton
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/care_photo"
             android:layout_width="120dp"
             android:layout_height="120dp"
@@ -27,7 +28,9 @@
             android:elevation="5dp"
             android:padding="20dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/profile" />
+            android:src="@drawable/profile"
+            app:border_color="@color/dp_border"
+            app:border_width="2dp"/>
 
         <RelativeLayout
             android:id="@+id/profile_layout"
@@ -43,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="76dp"
+                android:layout_marginTop="60dp"
                 android:fontFamily="sans-serif-light"
                 android:text="Full Name"
                 android:textColor="#fff"
@@ -74,53 +77,52 @@
 
 
             <TextView
-                android:id="@+id/care_fName"
+                android:id="@+id/care_fullname"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
-                android:hint="First Name"
-                android:padding="20dp" />
+                android:hint="Full Name :"
+                android:text="Vineet"
+                android:textStyle="bold"
+                android:textSize="17dp"
+                android:padding="10dp" />
 
             <TextView
-                android:id="@+id/care_lName"
+                android:id="@+id/care_exp"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
-                android:hint="Last Name"
-                android:padding="20dp" />
+                android:hint="Experience :"
+                android:padding="15dp" />
 
             <TextView
                 android:id="@+id/care_mail"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
-                android:hint="Mail"
+                android:hint="Mail :"
                 android:inputType="textEmailAddress"
-                android:padding="20dp" />
+                android:padding="15dp" />
 
             <TextView
                 android:id="@+id/care_dob"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
-                android:hint="Birthday (YYYY-MM-DD)"
+                android:hint="D.O.B (YYYY-MM-DD) :"
                 android:inputType="date"
-                android:padding="20dp" />
+                android:padding="15dp" />
 
             <TextView
                 android:id="@+id/care_address"
                 android:layout_width="match_parent"
-                android:layout_height="82dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:background="#fff"
                 android:gravity="top|left"
-                android:hint="Address"
+                android:hint="Address :"
                 android:inputType="textMultiLine"
-                android:lines="4"
-                android:maxLines="6"
-                android:minLines="4"
-                android:padding="20dp"
-                android:scrollbars="vertical" />
+                android:padding="15dp" />
 
             <Button
                 android:id="@+id/care_profile_hire"
@@ -132,16 +134,6 @@
                 android:textColor="#fff"
                 android:textSize="15dp"
                 android:textStyle="bold" />
-            <Button
-                android:id="@+id/care_profile_back"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/little_black"
-                android:text="Back"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:textColor="#fff"/>
         </LinearLayout>
     </RelativeLayout>
 </ScrollView>

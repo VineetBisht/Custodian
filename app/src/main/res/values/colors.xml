@@ -11,4 +11,5 @@
     <color name="color1">#CAAB4F</color>
     <color name="color2">#819D63</color>
     <color name="color3">#8B6DC0</color>
+    <color name="dp_border">#ffff</color>
 </resources>
